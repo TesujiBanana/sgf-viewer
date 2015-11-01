@@ -1,0 +1,50 @@
+{
+  "name": "sgf-viewer",
+  "version": "0.0.1",
+  "description": "SGF Viewer with React",
+  "main": "webpack.dev.config.js",
+  "dependencies": {
+    "express": "^4.13.3",
+    "hbs": "^3.1.1"
+  },
+  "devDependencies": {
+    "babel": "^6.0.14",
+    "babel-cli": "^6.0.14",
+    "babel-loader": "^6.0.0",
+    "babel-preset-es2015": "^6.0.14",
+    "babel-preset-react": "^6.0.14",
+    "chai": "^3.4.0",
+    "handlebars": "^4.0.4",
+    "history": "^1.13.0",
+    "mocha": "^2.3.3",
+    "nodemon": "^1.8.0",
+    "react": "^0.14.1",
+    "react-hot-loader": "^1.3.0",
+    "react-redux": "^4.0.0",
+    "react-router": "^1.0.0-rc3",
+    "redux": "^3.0.4",
+    "redux-logger": "^2.0.4",
+    "redux-router": "^1.0.0-beta3",
+    "redux-thunk": "^1.0.0",
+    "webpack": "^1.12.2",
+    "webpack-dev-server": "^1.12.1"
+  },
+  "scripts": {
+    "clean": "rm -rf lib",
+    "watch-js": "./node_modules/.bin/babel src -d lib --experimental -w",
+    "dev-server": "node lib/server/webpack",
+    "server": "./node_modules/.bin/nodemon lib/server/server",
+    "start": "npm run watch-js & npm run dev-server & npm run server",
+    "build": "npm run clean && ./node_modules/.bin/babel src -d lib --experimental"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TesujiBanana/sgf-viewer.git"
+  },
+  "author": "Chris Papazian",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TesujiBanana/sgf-viewer/issues"
+  },
+  "homepage": "https://github.com/TesujiBanana/sgf-viewer#readme"
+}
