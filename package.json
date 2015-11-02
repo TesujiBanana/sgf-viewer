@@ -16,6 +16,7 @@
     "chai": "^3.4.0",
     "handlebars": "^4.0.4",
     "history": "^1.13.0",
+    "isomorphic-fetch": "^2.2.0",
     "mocha": "^2.3.3",
     "nodemon": "^1.8.0",
     "react": "^0.14.1",
@@ -26,6 +27,7 @@
     "redux-logger": "^2.0.4",
     "redux-router": "^1.0.0-beta3",
     "redux-thunk": "^1.0.0",
+    "sgf-parser": "git+https://github.com/TesujiBanana/sgf-parser.git",
     "webpack": "^1.12.2",
     "webpack-dev-server": "^1.12.1"
   },
