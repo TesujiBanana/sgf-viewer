@@ -1,35 +1,50 @@
 import React from "react";
-import { connect } from "react-redux";
-import { loadSGFFromGist } from "../action-creators";
+import ReactDOM from "react-dom";
 
-class Gist extends React.Component {
+function waitForDocument(doc, cb) {
+  function inner() {
+    if (doc.readyState === "complete") {
+      cb();
+    } else {
+      setTimeout(inner, 0);
+    }
+  }
+  inner();
+}
 
-  componentWillMount() {
+export default class Gist extends React.Component {
+  // static propTypes = {
+  //   src: React.PropTypes.string.isRequired,
+  //   onLoad: React.PropTypes.func.isRequired
+  // };
 
+  componentDidMount() {
+    this.renderFrameContents();
   }
 
-  componentWillReceiveProps(nextProps) {
+  renderFrameContents() {
+    let contents = `<script src="https://gist.github.com/${this.props.src}.js"></script>`;
+    let doc = ReactDOM.findDOMNode(this).contentDocument;
 
+    waitForDocument(doc, () => {
+      doc.open();
+      doc.write(contents);
+      doc.close();
+
+      waitForDocument(doc, () => {
+        let divs = [].slice.call(doc.getElementsByClassName("file"));
+        let contents = divs.map( (d) => d.innerText);
+        this.props.onLoad(contents);
+      });
+    });
   }
 
   render() {
-    console.log("derp", this.props);
-    return <div>"errp"</div>
+    let style = {
+      visibility: "hidden",
+      position: "absolute"
+    };
+
+    return <iframe style={style} />;
   }
 }
-
-
-function mapStateToProps(state, ownProps) {
-  console.log(state, ownProps);
-  return {};
-}
-
-function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ loadSGFFromGist }, dispatch);
-}
-
-export default Gist; //connect(mapStateToProps)(Gist);
-
-  //
-  // <IndexRoute component={CPList} />
-  // <Route component={CPShow} path="/content_partner/:id" />

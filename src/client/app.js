@@ -1,9 +1,12 @@
+"use strict";
+
 import React from "react";
 
-export default class App extends React.Component {
+class App extends React.Component {
 
   render() {
-    console.log("errp");
-    return <div>{this.props.children}</div>
+    return (<div>{this.props.children}</div>)
   }
 }
+
+export default App;

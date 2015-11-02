@@ -2,10 +2,10 @@ import { Route, IndexRoute} from "react-router";
 import React from "react";
 
 import App from "./app";
-import Gist from "./components/gist";
+import SGFGist from "./components/sgf_gist";
 
 export default (
   <Route component={App} path="/">
-    <Route component={Gist} path="/g/**" />
+    <Route component={SGFGist} path="/g/*" />
   </Route>
 );
