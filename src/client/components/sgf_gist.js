@@ -17,7 +17,6 @@ class SGFGist extends React.Component {
 }
 
 function mapStateToProps(state, ownProps) {
-  console.log(state.router.params.splat);
   return {
     gist: state.router.params.splat
   };
