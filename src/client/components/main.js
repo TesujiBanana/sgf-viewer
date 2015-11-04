@@ -1,10 +1,10 @@
 import React from "react";
 
-import Goban from "./goban";
+import Board from "./board";
 
 export default class Main extends React.Component {
 
   render() {
-    return <div><Goban /></div>
+    return <div><Board /></div>
   }
 }
