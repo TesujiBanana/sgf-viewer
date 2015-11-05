@@ -28,6 +28,20 @@ function SGFReducer(state={}, action) {
       };
       return merge(state, { sgf, gameInfo, currentNode: sgf });
     }
+    case "NAVIGATE_BACK": {
+      if (state.currentNode && state.currentNode._parent) {
+        return merge(state, { currentNode: state.currentNode._parent })
+      } else {
+        return state;
+      }
+    }
+    case "NAVIGATE_FORWARD": {
+      if (state.currentNode && state.currentNode._next) {
+        return merge(state, { currentNode: state.currentNode._next })
+      } else {
+        return state;
+      }
+    }
     default:
       return state;
   };
