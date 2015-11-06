@@ -7,7 +7,13 @@ function merge(source, obj) {
   return _.extend({}, source, obj);
 }
 
-function SGFReducer(state={}, action) {
+let initialState = {
+  sgf: {},
+  gameInfo: {},
+  currentNode: null
+};
+
+function SGFReducer(state=initialState, action) {
   switch (action.type) {
     case "RECEIVE_SGF": {
       let sgf = action.sgf;

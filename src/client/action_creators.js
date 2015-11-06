@@ -12,14 +12,12 @@ export function loadSGF(raw) {
 };
 
 export function navigateBack() {
-  console.log("eerp");
   return {
     type: "NAVIGATE_BACK"
   }
 }
 
 export function navigateForward() {
-  console.log("derp");
   return {
     type: "NAVIGATE_FORWARD"
   }
