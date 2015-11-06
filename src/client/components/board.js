@@ -19,6 +19,34 @@ class Board extends React.Component {
     this.setState({height, width});
   }
 
+  renderLines(direction, size, boardSize) {
+    let interval = size / (boardSize);
+    let margin = interval / 2;
+
+    let lineStyle = {
+      stroke: "black",
+      strokeWidth: "1px"
+    };
+
+    return _.times(boardSize, (i) => {
+      let offset = margin + i * interval;
+      let key = `line-${direction}-${i}`;
+      if (direction === "vertical") {
+        return <line key={key} x1={offset} x2={offset} y1={margin} y2={size-margin} style={lineStyle} />
+      } else {
+        return <line key={key} x1={margin} x2={size-margin} y1={offset} y2={offset} style={lineStyle} />
+      }
+    })
+  }
+
+  renderVerticalLines(size, boardSize) {
+    return this.renderLines("vertical", size, boardSize)
+  }
+
+  renderHorizontalLines(size, boardSize) {
+    return this.renderLines("horizontal", size, boardSize)
+  }
+
   render() {
     let margin = 20;
     let size = Math.min(this.state.height, this.state.width);
@@ -40,20 +68,8 @@ class Board extends React.Component {
       <svg height={svgHeight} width={svgWidth}>
         <g transform={`translate(${margin}, ${margin})`}>
           <rect width={size} height={size} style={rectStyle} />
-          { _.times(boardSize, (i) => {
-            let interval = size / (boardSize);
-            let margin = interval / 2;
-            let x = margin + i * interval;
-            let key = `line-vertical-${i}`;
-            return <line key={key} x1={x} x2={x} y1={margin} y2={size-margin} style={lineStyle} />
-          })}
-          { _.times(boardSize, (i) => {
-            let interval = size / (boardSize);
-            let margin = interval / 2;
-            let y = margin + i * interval;
-            let key = `line-horizontal-${i}`;
-            return <line key={key} x1={margin} x2={size-margin} y1={y} y2={y} style={lineStyle} />
-          })}
+          {this.renderVerticalLines(size, boardSize)}
+          {this.renderHorizontalLines(size, boardSize)}
         </g>
       </svg>
     )
