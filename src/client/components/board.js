@@ -5,10 +5,20 @@ import ReactDOM from "react-dom";
 import { connect } from "react-redux";
 import { getMovesFromNode } from "../utils";
 
+// Hack! If 1px lines are drawn on whole numbers with shape-rendering set to
+// crispEdges, it's drawing a 2px line ... so offset it by a fraction.
+function roundUp(x) {
+  if (Math.floor(x) === x) {
+    return x + 0.25;
+  } else {
+    return x
+  }
+}
+
 class Board extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {height: 400, width: 400};
+    this.state = {height: 480, width: 480};
   }
 
   handleResize() {
@@ -19,32 +29,38 @@ class Board extends React.Component {
     this.setState({height, width});
   }
 
-  renderLines(direction, size, boardSize) {
-    let interval = size / (boardSize);
+  renderGrid(size, boardSize) {
+    let interval = size / boardSize;
     let margin = interval / 2;
+    let gridSize = size - margin * 2;
 
-    let lineStyle = {
+    let style = {
       stroke: "black",
-      strokeWidth: "1px"
+      strokeWidth: "1px",
+      fill: "None",
+      shapeRendering: "crispEdges"
     };
 
-    return _.times(boardSize, (i) => {
-      let offset = margin + i * interval;
-      let key = `line-${direction}-${i}`;
-      if (direction === "vertical") {
-        return <line key={key} x1={offset} x2={offset} y1={margin} y2={size-margin} style={lineStyle} />
-      } else {
-        return <line key={key} x1={margin} x2={size-margin} y1={offset} y2={offset} style={lineStyle} />
-      }
-    })
-  }
+    let horizontalLines = _.range(1, boardSize-1).map( (i) => {
+      return [`M${roundUp(margin)} ${roundUp(margin + i*interval)}`, `h ${roundUp(gridSize)}`];
+    });
 
-  renderVerticalLines(size, boardSize) {
-    return this.renderLines("vertical", size, boardSize)
-  }
+    let verticalLines = _.range(1, boardSize-1).map( (i) => {
+      return [`M${roundUp(margin + i*interval)} ${roundUp(margin)}`, `v ${roundUp(gridSize)}`];
+    });
 
-  renderHorizontalLines(size, boardSize) {
-    return this.renderLines("horizontal", size, boardSize)
+    let grid = [
+      `M${margin} ${margin}`,
+      `h ${gridSize}`,
+      `v ${gridSize}`,
+      `h ${-gridSize}`,
+      `v ${-gridSize}`,
+      "Z",
+      ...verticalLines,
+      ...horizontalLines
+    ]
+
+    return <path d={grid.join(" ")} style={style} />
   }
 
   render() {
@@ -59,17 +75,11 @@ class Board extends React.Component {
       fill: "#ffcc66",
     };
 
-    let lineStyle = {
-      stroke: "black",
-      strokeWidth: "1px"
-    };
-
     return (
       <svg height={svgHeight} width={svgWidth}>
         <g transform={`translate(${margin}, ${margin})`}>
           <rect width={size} height={size} style={rectStyle} />
-          {this.renderVerticalLines(size, boardSize)}
-          {this.renderHorizontalLines(size, boardSize)}
+          {this.renderGrid(size, boardSize)}
         </g>
       </svg>
     )
