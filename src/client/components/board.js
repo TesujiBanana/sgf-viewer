@@ -63,23 +63,49 @@ class Board extends React.Component {
     return <path d={grid.join(" ")} style={style} />
   }
 
+  renderStones(size, boardSize, moves) {
+    function parseColor(m) {
+      if (m.B) return 'B';
+      if (m.W) return 'W'
+    }
+    function parseCoordinate(m, color) {
+      let offset = 'a'.charCodeAt(0);
+      let x = m[color].charCodeAt(0) - offset,
+          y = m[color].charCodeAt(1) - offset;
+
+      return [x, y];
+    }
+
+    return moves.map( (m, i) => {
+      let color = parseColor(m);
+      let [x, y] = parseCoordinate(m, color);
+
+      let style = {
+        fill: color === "B" ? "black" : "white"
+      }
+
+      let interval = size / boardSize;
+      let margin = interval / 2;
+
+      return (<circle r={margin} cx={margin + interval * x} cy={margin + interval * y} style={style} />)
+    });
+  }
+
   render() {
     let margin = 20;
-    let size = Math.min(this.state.height, this.state.width);
-    let boardSize = this.props.boardSize;
-
-    let svgHeight = size + margin * 2,
-        svgWidth = size + margin * 2;
+    let svgSize = Math.min(this.state.height, this.state.width);
+    let size = svgSize - margin * 2;
 
     let rectStyle = {
       fill: "#ffcc66",
     };
 
     return (
-      <svg height={svgHeight} width={svgWidth}>
+      <svg height={svgSize} width={svgSize}>
         <g transform={`translate(${margin}, ${margin})`}>
           <rect width={size} height={size} style={rectStyle} />
-          {this.renderGrid(size, boardSize)}
+          {this.renderGrid(size, this.props.boardSize)}
+          {this.renderStones(size, this.props.boardSize, this.props.moves)}
         </g>
       </svg>
     )
