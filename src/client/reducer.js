@@ -8,7 +8,7 @@ function merge(source, obj) {
 }
 
 let initialState = {
-  sgf: {},
+  nodes: [],
   gameInfo: {},
   currentNode: null
 };
@@ -16,23 +16,24 @@ let initialState = {
 function SGFReducer(state=initialState, action) {
   switch (action.type) {
     case "RECEIVE_SGF": {
-      let sgf = action.sgf;
+      let nodes = action.sgf; //sgf = action.sgf;
+      let currentNode = nodes[0];
       let gameInfo = {
-        name: sgf.GN,
-        date: sgf.DT,
-        event: sgf.EV,
-        rules: sgf.RU,
-        overtimeMethod: sgf.OT,
-        timeLimits: sgf.TM,
-        blackPlayer: sgf.PB,
-        blackPlayerRank: sgf.BR,
-        whitePlayer: sgf.PW,
-        whitePlayerRank: sgf.WR,
-        info: sgf.GC,
-        source: sgf.SO,
-        copyright: sgf.CP
+        name: currentNode.GN,
+        date: currentNode.DT,
+        event: currentNode.EV,
+        rules: currentNode.RU,
+        overtimeMethod: currentNode.OT,
+        timeLimits: currentNode.TM,
+        blackPlayer: currentNode.PB,
+        blackPlayerRank: currentNode.BR,
+        whitePlayer: currentNode.PW,
+        whitePlayerRank: currentNode.WR,
+        info: currentNode.GC,
+        source: currentNode.SO,
+        copyright: currentNode.CP
       };
-      return merge(state, { sgf, gameInfo, currentNode: sgf });
+      return merge(state, { nodes, gameInfo, currentNode });
     }
     case "NAVIGATE_BACK": {
       if (state.currentNode && state.currentNode._parent) {

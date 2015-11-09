@@ -7,7 +7,8 @@
     "babel-plugin-react-constant-elements": "^1.0.3",
     "babel-plugin-transform-class-properties": "^6.0.14",
     "express": "^4.13.3",
-    "hbs": "^3.1.1"
+    "hbs": "^3.1.1",
+    "sgf-parser": "git+https://github.com/TesujiBanana/sgf-parser.git"
   },
   "devDependencies": {
     "babel": "^6.0.14",
@@ -32,7 +33,6 @@
     "redux-logger": "^2.0.4",
     "redux-router": "^1.0.0-beta3",
     "redux-thunk": "^1.0.0",
-    "sgf-parser": "git+https://github.com/TesujiBanana/sgf-parser.git#0.1.0",
     "underscore": "^1.8.3",
     "webpack": "^1.12.2",
     "webpack-dev-server": "^1.12.1"
