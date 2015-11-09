@@ -15,6 +15,28 @@ function roundUp(x) {
   }
 }
 
+class Defs extends React.Component {
+  render() {
+    return (
+      <defs>
+        <radialGradient id="blackFill" cx="0.5" cy="0.5" r="0.5" fx="0" fy="0" r="0.85">
+          <stop offset="0%" style={{stopColor: "black", stopOpacity: 1}} />
+          <stop offset="100%" style={{stopColor: "#505050", stopOpacity: 1}} />
+        </radialGradient>
+        <radialGradient id="whiteFill" cx="0.5" cy="0.5" r="0.5" fx="0" fy="0" r="0.85">
+          <stop offset="0%" style={{stopColor: "#d0d0d0", stopOpacity: 1}} />
+          <stop offset="100%" style={{stopColor: "white", stopOpacity: 1}} />
+        </radialGradient>
+        <filter id="stoneShadow" x="0" y="0" width="200%" height="200%">
+          <feOffset result="offOut" in="SourceGraphic" dx="20" dy="20" />
+          <feGaussianBlur result="blurOut" in="offOut" stdDeviation="10" />
+          <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
+        </filter>
+      </defs>
+    );
+  }
+}
+
 class Board extends React.Component {
   constructor(props) {
     super(props);
@@ -80,14 +102,13 @@ class Board extends React.Component {
       let color = parseColor(m);
       let [x, y] = parseCoordinate(m, color);
 
-      let style = {
-        fill: color === "B" ? "black" : "white"
-      }
-
       let interval = size / boardSize;
       let margin = interval / 2;
+      let radius = 0.9 * margin;
+      let fill = `url(#${color === "B" ? "blackFill" : "whiteFill"})`;
+      let filter = "url(#stoneShadow)";
 
-      return (<circle r={margin} cx={margin + interval * x} cy={margin + interval * y} style={style} />)
+      return (<circle r={radius} cx={margin + interval * x} cy={margin + interval * y} fill={fill} filter={filter} />)
     });
   }
 
@@ -102,6 +123,8 @@ class Board extends React.Component {
 
     return (
       <svg height={svgSize} width={svgSize}>
+        <Defs />
+
         <g transform={`translate(${margin}, ${margin})`}>
           <rect width={size} height={size} style={rectStyle} />
           {this.renderGrid(size, this.props.boardSize)}

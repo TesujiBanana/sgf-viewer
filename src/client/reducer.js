@@ -16,7 +16,7 @@ let initialState = {
 function SGFReducer(state=initialState, action) {
   switch (action.type) {
     case "RECEIVE_SGF": {
-      let nodes = action.sgf; //sgf = action.sgf;
+      let nodes = action.sgf;
       let currentNode = nodes[0];
       let gameInfo = {
         name: currentNode.GN,
