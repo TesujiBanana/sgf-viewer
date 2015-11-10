@@ -15,42 +15,6 @@ function roundUp(x) {
   }
 }
 
-class Defs extends React.Component {
-  render() {
-    return (
-      <defs>
-        <radialGradient id="blackFill" cx="0.5" cy="0.5" r="0.5" fx="0" fy="0" r="0.85">
-          <stop offset="0%" style={{stopColor: "black", stopOpacity: 1}} />
-          <stop offset="100%" style={{stopColor: "#505050", stopOpacity: 1}} />
-        </radialGradient>
-        <radialGradient id="whiteFill" cx="0.5" cy="0.5" r="0.5" fx="0" fy="0" r="0.85">
-          <stop offset="0%" style={{stopColor: "#d0d0d0", stopOpacity: 1}} />
-          <stop offset="100%" style={{stopColor: "white", stopOpacity: 1}} />
-        </radialGradient>
-        <filter id="f1" x="0" y="0" width="200%" height="200%">
-          <feOffset result="offOut" in="SourceGraphic" dx="20" dy="20" />
-          <feBlend in="SourceGraphic" in2="offOut" mode="normal" />
-        </filter>
-        <filter id="stoneShadow" x="0" y="0" width="200%" height="200%">
-          <feOffset result="offOut" in="SourceAlpha" dx="10" dy="10" />
-          <feGaussianBlur result="blurOut" in="offOut" stdDeviation="10" />
-          <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
-        </filter>
-        <filter id="drop-shadow">
-         <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
-         <feOffset dx="10" dy="10" result="offsetblur"/>
-         <feFlood flood-color="red"/>
-         <feComposite in2="offsetblur" operator="in"/>
-         <feMerge>
-           <feMergeNode/>
-           <feMergeNode in="SourceGraphic"/>
-         </feMerge>
-        </filter>
-      </defs>
-    );
-  }
-}
-
 class Board extends React.Component {
   constructor(props) {
     super(props);
