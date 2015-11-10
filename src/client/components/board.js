@@ -27,10 +27,24 @@ class Defs extends React.Component {
           <stop offset="0%" style={{stopColor: "#d0d0d0", stopOpacity: 1}} />
           <stop offset="100%" style={{stopColor: "white", stopOpacity: 1}} />
         </radialGradient>
-        <filter id="stoneShadow" x="0" y="0" width="200%" height="200%">
+        <filter id="f1" x="0" y="0" width="200%" height="200%">
           <feOffset result="offOut" in="SourceGraphic" dx="20" dy="20" />
+          <feBlend in="SourceGraphic" in2="offOut" mode="normal" />
+        </filter>
+        <filter id="stoneShadow" x="0" y="0" width="200%" height="200%">
+          <feOffset result="offOut" in="SourceAlpha" dx="10" dy="10" />
           <feGaussianBlur result="blurOut" in="offOut" stdDeviation="10" />
           <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
+        </filter>
+        <filter id="drop-shadow">
+         <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+         <feOffset dx="10" dy="10" result="offsetblur"/>
+         <feFlood flood-color="red"/>
+         <feComposite in2="offsetblur" operator="in"/>
+         <feMerge>
+           <feMergeNode/>
+           <feMergeNode in="SourceGraphic"/>
+         </feMerge>
         </filter>
       </defs>
     );
@@ -49,6 +63,66 @@ class Board extends React.Component {
         width = svg.offsetWidth;
 
     this.setState({height, width});
+  }
+
+  getDefs() {
+    return { __html: `
+      <filter id="white-stone-shadows" x="-50%" y="-50%" width="200%" height="200%">
+        <feComponentTransfer in=SourceAlpha>
+          <feFuncA type="table" tableValues="1 0" />
+        </feComponentTransfer>
+        <feGaussianBlur stdDeviation="4"/>
+        <feOffset dx="2" dy="2" result="offsetblur"/>
+        <feFlood flood-color="#d0d0d0"/>
+        <feComposite in2="offsetblur" operator="in"/>
+        <feComposite in2="SourceAlpha" operator="in" />
+        <feMerge result="inset">
+          <feMergeNode in="SourceGraphic" />
+          <feMergeNode />
+        </feMerge>
+
+      	<feGaussianBlur in="SourceAlpha" stdDeviation="1"/>
+    		<feOffset dx="2" dy="2" result="offsetblur"/>
+        <feComponentTransfer>
+          <feFuncA type="linear" slope="0.5"/>
+        </feComponentTransfer>
+        <feComposite in2="offsetblur" operator="in" result="drop"/>
+
+    		<feMerge>
+          <feMergeNode in="drop"/>
+          <feMergeNode in="SourceGraphic"/>
+    			<feMergeNode in="inset"/>
+    		</feMerge>
+    	</filter>
+
+      <filter id="black-stone-shadows" x="-50%" y="-50%" width="200%" height="200%">
+        <feComponentTransfer in=SourceAlpha>
+          <feFuncA type="table" tableValues="1 0" />
+        </feComponentTransfer>
+        <feGaussianBlur stdDeviation="4"/>
+        <feOffset dx="2" dy="2" result="offsetblur"/>
+        <feFlood flood-color="black"/>
+        <feComposite in2="offsetblur" operator="in"/>
+        <feComposite in2="SourceAlpha" operator="in" />
+        <feMerge result="inset">
+          <feMergeNode in="SourceGraphic" />
+          <feMergeNode />
+        </feMerge>
+
+      	<feGaussianBlur in="SourceAlpha" stdDeviation="1"/>
+    		<feOffset dx="2" dy="2" result="offsetblur"/>
+        <feComponentTransfer>
+          <feFuncA type="linear" slope="0.5"/>
+        </feComponentTransfer>
+        <feComposite in2="offsetblur" operator="in" result="drop"/>
+
+    		<feMerge>
+          <feMergeNode in="drop"/>
+          <feMergeNode in="SourceGraphic"/>
+    			<feMergeNode in="inset"/>
+    		</feMerge>
+    	</filter>
+    `};
   }
 
   renderGrid(size, boardSize) {
@@ -105,10 +179,19 @@ class Board extends React.Component {
       let interval = size / boardSize;
       let margin = interval / 2;
       let radius = 0.9 * margin;
-      let fill = `url(#${color === "B" ? "blackFill" : "whiteFill"})`;
-      let filter = "url(#stoneShadow)";
 
-      return (<circle r={radius} cx={margin + interval * x} cy={margin + interval * y} fill={fill} filter={filter} />)
+      let style = {
+        fill: color === "B" ? "#333333" : "white",
+        filter: color === "B" ? "url(#black-stone-shadows)" : "url(#white-stone-shadows)"
+      };
+
+      return (
+        <circle key={`move-${i}`}
+                r={radius}
+                cx={margin + interval * x}
+                cy={margin + interval * y}
+                style={style} />
+      );
     });
   }
 
@@ -123,7 +206,7 @@ class Board extends React.Component {
 
     return (
       <svg height={svgSize} width={svgSize}>
-        <Defs />
+        <defs dangerouslySetInnerHTML={this.getDefs()} />
 
         <g transform={`translate(${margin}, ${margin})`}>
           <rect width={size} height={size} style={rectStyle} />
