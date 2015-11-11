@@ -49,6 +49,11 @@ function SGFReducer(state=initialState, action) {
         return state;
       }
     }
+    case "NAVIGATE_TO_MOVE": {
+      // TODO: some sort of error checking
+      console.log(action);
+      return merge(state, { currentNode: action.move })
+    }
     default:
       return state;
   };

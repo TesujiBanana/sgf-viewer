@@ -22,3 +22,10 @@ export function navigateForward() {
     type: "NAVIGATE_FORWARD"
   }
 }
+
+export function navigateToMove(move) {
+  return {
+    type: "NAVIGATE_TO_MOVE",
+    move: move
+  }
+}
