@@ -36,7 +36,7 @@ class Board extends React.Component {
           <feFuncA type="table" tableValues="1 0" />
         </feComponentTransfer>
         <feGaussianBlur stdDeviation="4"/>
-        <feOffset dx="2" dy="2" result="offsetblur"/>
+        <feOffset dx="-2" dy="-2" result="offsetblur"/>
         <feFlood flood-color="#d0d0d0"/>
         <feComposite in2="offsetblur" operator="in"/>
         <feComposite in2="SourceAlpha" operator="in" />
