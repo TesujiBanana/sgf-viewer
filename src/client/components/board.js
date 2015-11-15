@@ -3,7 +3,6 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 import { connect } from "react-redux";
-import { getMovesFromNode } from "../utils";
 
 // Hack! If 1px lines are drawn on whole numbers with shape-rendering set to
 // crispEdges, it's drawing a 2px line ... so offset it by a fraction.
@@ -123,22 +122,22 @@ class Board extends React.Component {
     return <path d={grid.join(" ")} style={style} />
   }
 
-  renderStones(size, boardSize, moves) {
+  renderStones(size, boardSize, stones) {
     function parseColor(m) {
       if (m.B) return 'B';
       if (m.W) return 'W'
     }
-    function parseCoordinate(m, color) {
+    function parseCoordinate(coords) {
       let offset = 'a'.charCodeAt(0);
-      let x = m[color].charCodeAt(0) - offset,
-          y = m[color].charCodeAt(1) - offset;
+      let x = coords.charCodeAt(0) - offset,
+          y = coords.charCodeAt(1) - offset;
 
       return [x, y];
     }
 
-    return moves.map( (m, i) => {
-      let color = parseColor(m);
-      let [x, y] = parseCoordinate(m, color);
+    return _.chain(stones).keys().map(coords => {
+      let color = stones[coords];
+      let [x, y] = parseCoordinate(coords);
 
       let interval = size / boardSize;
       let margin = interval / 2;
@@ -150,13 +149,13 @@ class Board extends React.Component {
       };
 
       return (
-        <circle key={`move-${i}`}
+        <circle key={`move-${coords}`}
                 r={radius}
                 cx={margin + interval * x}
                 cy={margin + interval * y}
                 style={style} />
       );
-    });
+    }).value();
   }
 
   render() {
@@ -175,7 +174,7 @@ class Board extends React.Component {
         <g transform={`translate(${margin}, ${margin})`}>
           <rect width={size} height={size} style={rectStyle} />
           {this.renderGrid(size, this.props.boardSize)}
-          {this.renderStones(size, this.props.boardSize, this.props.moves)}
+          {this.renderStones(size, this.props.boardSize, this.props.stones)}
         </g>
       </svg>
     )
@@ -184,8 +183,8 @@ class Board extends React.Component {
 
 function mapStateToProps(state) {
   return {
-    boardSize: state.sgf.gameInfo.SZ || 19,
-    moves: getMovesFromNode(state.sgf.currentNode)
+    boardSize: state.sgf.board.boardSize,
+    stones: state.sgf.board.stones
   };
 }
 
