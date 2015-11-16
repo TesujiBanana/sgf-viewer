@@ -20,6 +20,7 @@ class Board extends React.Component {
     this.state = {height: 480, width: 480};
   }
 
+
   handleResize() {
     let svg = ReactDOM.findDOMNode(this);
     let height = svg.offsetHeight,

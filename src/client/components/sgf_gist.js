@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from 'redux';
-import { loadSGF } from "../action_creators";
+import { loadSGF } from "../action_creators/sgf";
 import Gist from "./gist";
 
 class SGFGist extends React.Component {

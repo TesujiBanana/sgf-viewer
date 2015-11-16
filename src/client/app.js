@@ -7,7 +7,7 @@ import Main from "./components/main";
 class App extends React.Component {
 
   render() {
-    return (<div>{this.props.children}<Main /></div>)
+    return (<div className="container-fluid">{this.props.children}<Main /></div>)
   }
 }
 

@@ -8,6 +8,7 @@ function merge(source, obj) {
   return _.extend({}, source, obj);
 }
 
+// TODO: account for game info attributes ...
 let emptyBoard = {
   boardSize: 19,
   currentTurn: "B",
@@ -53,6 +54,11 @@ function SGFReducer(state=initialState, action) {
       };
       return merge(state, { nodes, gameInfo, currentNode });
     }
+    case "NAVIGATE_START": {
+      let currentNode = state.nodes[0];
+      let board = emptyBoard;
+      return merge(state, { currentNode, board });
+    }
     case "NAVIGATE_BACK": {
       if (state.currentNode && state.currentNode._parent) {
         let currentNode = state.currentNode._parent;
@@ -70,6 +76,15 @@ function SGFReducer(state=initialState, action) {
       } else {
         return state;
       }
+    }
+    case "NAVIGATE_END": {
+      // let currentNode =
+      var currentNode = state.currentNode;
+      while (currentNode._next) {
+        currentNode = currentNode._next;
+      }
+      let board = replayMoves(currentNode);
+      return merge(state, { currentNode, board });
     }
     case "NAVIGATE_TO_MOVE": {
 

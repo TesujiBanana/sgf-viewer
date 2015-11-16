@@ -25,7 +25,10 @@ module.exports = {
   },
   module: {
     loaders: [
-      { test: /\.jsx?$/, loaders: ['react-hot', 'babel-loader'], exclude: /node_modules/ }
+      { test: /\.jsx?$/, loaders: ['react-hot', 'babel-loader'], exclude: /node_modules/ },
+      { test: /\.scss$/, loaders: ["style", "css?sourceMap", "sass?sourceMap"] },
+      { test: /\.woff$/, loader: "url-loader?limit=10000&minetype=application/font-woff" },
+      { test: /\.(ttf|eot|svg)$/, loader: "file-loader" },
     ]
   }
 }

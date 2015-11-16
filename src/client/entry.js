@@ -27,3 +27,5 @@ ReactDOM.render(
     <ReduxRouter routes={routes} />
   </Provider>, document.getElementById('app')
 );
+
+import "../../styles/app.scss";

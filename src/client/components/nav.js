@@ -3,30 +3,29 @@ import ReactDOM from "react-dom";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 
-import { navigateBack, navigateForward } from "../action_creators";
+import { navigateStart, navigateBack, navigateForward, navigateEnd } from "../action_creators/navigation";
 
 class Nav extends React.Component {
 
-  handleClickBack(e) {
-    this.props.actions.navigateBack();
-  }
-
-  handleClickForward(e) {
-    this.props.actions.navigateForward();
-  }
-
   render() {
+    let style = {
+      textAlign: "center"
+    };
+
     return (
-      <div>
-        <button onClick={this.handleClickBack.bind(this)}>Back</button>
-        <button onClick={this.handleClickForward.bind(this)}>Forward</button>
+      <div style={style}>
+        <span className="glyphicon glyphicon-fast-backward" aria-hidden="true" onClick={this.props.actions.navigateStart}/>
+        <span className="glyphicon glyphicon-step-backward" aria-hidden="true" onClick={this.props.actions.navigateBack}/>
+        <span className="glyphicon glyphicon-step-forward" aria-hidden="true" onClick={this.props.actions.navigateForward}/>
+        <span className="glyphicon glyphicon-fast-forward" aria-hidden="true" onClick={this.props.actions.navigateEnd}/>
+
       </div>
     );
   }
 }
 
 function mapDispatchToProps(dispatch) {
-  let actionCreators = { navigateBack, navigateForward };
+  let actionCreators = { navigateStart, navigateBack, navigateForward, navigateEnd };
   return { actions: bindActionCreators(actionCreators, dispatch) };
 }
 

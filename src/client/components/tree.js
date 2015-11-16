@@ -5,7 +5,7 @@ import ReactDOM from "react-dom";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 
-import { navigateToMove } from "../action_creators";
+import { navigateToMove } from "../action_creators/navigation";
 
 class Tree extends React.Component {
 

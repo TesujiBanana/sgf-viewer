@@ -13,7 +13,7 @@ export default class Main extends React.Component {
     };
 
     return (
-      <div style={divStyle}>
+      <div className="col-md-6">
         <Board />
         <Nav />
         <Tree />
