@@ -14,11 +14,10 @@ class Nav extends React.Component {
 
     return (
       <div style={style}>
-        <span className="glyphicon glyphicon-fast-backward" aria-hidden="true" onClick={this.props.actions.navigateStart}/>
-        <span className="glyphicon glyphicon-step-backward" aria-hidden="true" onClick={this.props.actions.navigateBack}/>
-        <span className="glyphicon glyphicon-step-forward" aria-hidden="true" onClick={this.props.actions.navigateForward}/>
-        <span className="glyphicon glyphicon-fast-forward" aria-hidden="true" onClick={this.props.actions.navigateEnd}/>
-
+        <i className="fa fa-fast-backward" onClick={this.props.actions.navigateStart}/>
+        <i className="fa fa-step-backward" onClick={this.props.actions.navigateBack}/>
+        <i className="fa fa-step-forward" onClick={this.props.actions.navigateForward}/>
+        <i className="fa fa-fast-forward" onClick={this.props.actions.navigateEnd}/>
       </div>
     );
   }
