@@ -27,19 +27,19 @@ class Tree extends React.Component {
       let [x, y] = parseCoordinate(m, color);
 
       let interval = 25; //size / boardSize;
-      let margin = 10; //interval / 2;
-      let radius = 0.9 * margin;
+      // let margin = 10; //interval / 2;
+      let radius = 9;
 
       let style = {
         fill: color === "B" ? "#333333" : "white",
-        // filter: color === "B" ? "url(#black-stone-shadows)" : "url(#white-stone-shadows)"
+        filter: color === "B" ? "url(#black-stone-shadows)" : "url(#white-stone-shadows)"
       };
 
       return (
         <circle key={`move-${i}`}
                 r={radius}
-                cx={10 + margin + interval * i}
-                cy={10 + margin}
+                cx={10  + interval * i}
+                cy={10 }
                 style={style}
                 onClick={this.props.actions.navigateToMove.bind(this, m)} />
       );

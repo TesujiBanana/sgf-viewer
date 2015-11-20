@@ -20,13 +20,16 @@ class Board extends React.Component {
     this.state = {height: 480, width: 480};
   }
 
-
   handleResize() {
     let svg = ReactDOM.findDOMNode(this);
     let height = svg.offsetHeight,
         width = svg.offsetWidth;
 
     this.setState({height, width});
+  }
+
+  handleMouseMove(e) {
+    console.log(e);
   }
 
   getDefs() {
@@ -89,10 +92,8 @@ class Board extends React.Component {
     `};
   }
 
-  renderGrid(size, boardSize) {
-    let interval = size / boardSize;
-    let margin = interval / 2;
-    let gridSize = size - margin * 2;
+  renderGrid(boardSize, unit, margin) {
+    let gridSize = (boardSize - 1) * unit;
 
     let style = {
       stroke: "black",
@@ -102,15 +103,15 @@ class Board extends React.Component {
     };
 
     let horizontalLines = _.range(1, boardSize-1).map( (i) => {
-      return [`M${roundUp(margin)} ${roundUp(margin + i*interval)}`, `h ${roundUp(gridSize)}`];
+      return `M${roundUp(margin)} ${roundUp(margin + i*unit)} h ${gridSize}`;
     });
 
     let verticalLines = _.range(1, boardSize-1).map( (i) => {
-      return [`M${roundUp(margin + i*interval)} ${roundUp(margin)}`, `v ${roundUp(gridSize)}`];
+      return `M${roundUp(margin + i*unit)} ${roundUp(margin)} v ${gridSize}`;
     });
 
     let grid = [
-      `M${margin} ${margin}`,
+      `M${roundUp(margin)} ${roundUp(margin)}`,
       `h ${gridSize}`,
       `v ${gridSize}`,
       `h ${-gridSize}`,
@@ -123,7 +124,7 @@ class Board extends React.Component {
     return <path d={grid.join(" ")} style={style} />
   }
 
-  renderStones(size, boardSize, stones) {
+  renderStones(stones, boardSize, unit, margin) {
     function parseColor(m) {
       if (m.B) return 'B';
       if (m.W) return 'W'
@@ -140,9 +141,7 @@ class Board extends React.Component {
       let color = stones[coords];
       let [x, y] = parseCoordinate(coords);
 
-      let interval = size / boardSize;
-      let margin = interval / 2;
-      let radius = 0.9 * margin;
+      let radius = 0.9 * (unit / 2);
 
       let style = {
         fill: color === "B" ? "#333333" : "white",
@@ -152,17 +151,21 @@ class Board extends React.Component {
       return (
         <circle key={`move-${coords}`}
                 r={radius}
-                cx={margin + interval * x}
-                cy={margin + interval * y}
+                cx={margin + unit * x}
+                cy={margin + unit * y}
                 style={style} />
       );
     }).value();
   }
 
+  renderStonePreview() {}
+
   render() {
-    let margin = 20;
     let svgSize = Math.min(this.state.height, this.state.width);
-    let size = svgSize - margin * 2;
+    let size = svgSize;
+
+    let margin = 22;
+    let unit = (size - margin * 2) / (this.props.boardSize - 1);
 
     let rectStyle = {
       fill: "#ffcc66",
@@ -172,10 +175,11 @@ class Board extends React.Component {
       <svg height={svgSize} width={svgSize}>
         <defs dangerouslySetInnerHTML={this.getDefs()} />
 
-        <g transform={`translate(${margin}, ${margin})`}>
+        <g onMouseMove={this.handleMouseMove}>
           <rect width={size} height={size} style={rectStyle} />
-          {this.renderGrid(size, this.props.boardSize)}
-          {this.renderStones(size, this.props.boardSize, this.props.stones)}
+          {this.renderGrid(this.props.boardSize, unit, margin)}
+          {this.renderStones(this.props.stones, this.props.boardSize, unit, margin)}
+          {this.renderStonePreview()}
         </g>
       </svg>
     )
@@ -183,9 +187,11 @@ class Board extends React.Component {
 }
 
 function mapStateToProps(state) {
+  // return state.sgf.board
   return {
     boardSize: state.sgf.board.boardSize,
-    stones: state.sgf.board.stones
+    stones: state.sgf.board.stones,
+    currentTurn: state.sgf.board.currentTurn
   };
 }
 
