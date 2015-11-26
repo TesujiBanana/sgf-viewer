@@ -14,6 +14,22 @@ function roundUp(x) {
   }
 }
 
+class Stone extends React.Component {
+  render() {
+    let radius = 0.9 * (this.props.unit / 2);
+
+    let style = {
+      fill: this.props.color === "B" ? "#333333" : "white",
+      filter: this.props.color === "B" ? "url(#black-stone-shadows)" : "url(#white-stone-shadows)"
+      // fill: color === "B" ? "black" : "white",
+      // stroke: "black",
+      // strokeWidth: "0.25px",
+    };
+
+    return <circle r={radius} style={style} />
+  }
+}
+
 class Board extends React.Component {
   constructor(props) {
     super(props);
@@ -29,7 +45,7 @@ class Board extends React.Component {
   }
 
   handleMouseMove(e) {
-    console.log(e);
+    // console.log(e);
   }
 
   getDefs() {
@@ -92,6 +108,19 @@ class Board extends React.Component {
     `};
   }
 
+  mergeBoardElements(...args) {
+    let keys = _.union(..._.map(args, _.keys));
+
+    let values = _.map(keys, k => {
+      return _.chain(args)
+        .map(_.property(k))
+        .filter(Boolean)
+        .value()
+    })
+
+    return _.object(keys, values)
+  }
+
   renderGrid(boardSize, unit, margin) {
     let gridSize = (boardSize - 1) * unit;
 
@@ -146,6 +175,10 @@ class Board extends React.Component {
       let style = {
         fill: color === "B" ? "#333333" : "white",
         filter: color === "B" ? "url(#black-stone-shadows)" : "url(#white-stone-shadows)"
+        // fill: color === "B" ? "black" : "white",
+        // stroke: "black",
+        // strokeWidth: "0.25px",
+
       };
 
       return (
@@ -158,18 +191,62 @@ class Board extends React.Component {
     }).value();
   }
 
-  renderStonePreview() {}
+  renderBoardElements(boardSize, unit, margin, boardElements) {
+    function parseCoordinate(coords) {
+      let offset = 'a'.charCodeAt(0);
+      let x = coords.charCodeAt(0) - offset,
+          y = coords.charCodeAt(1) - offset;
+
+      return [x, y];
+    }
+
+    return _.chain(boardElements).keys().map(coords => {
+      let elements = boardElements[coords];
+      let [x, y] = parseCoordinate(coords);
+
+      let props = {
+        key: coords,
+        transform: `translate(${margin + unit * x}, ${margin + unit * y})`,
+      };
+
+      let children = _.map(boardElements[coords], (el, i) => {
+        if (el == "B") {
+          return <Stone key={i} color="B" unit={unit} />
+        } else if (el = "W") {
+          return <Stone key={i} color="W" unit={unit} />
+        }
+        // else if (el = "circle") {
+        //   // return <circle key={i}
+        //   <circle key={`move-${coords}`}
+        //           r={radius}
+        //
+        // }
+      });
+
+      return React.createElement("g", props, children)
+    }).value();
+
+  }
 
   render() {
     let svgSize = Math.min(this.state.height, this.state.width);
     let size = svgSize;
 
-    let margin = 22;
-    let unit = (size - margin * 2) / (this.props.boardSize - 1);
+    let unit = size / (this.props.boardSize + 0.5);
+    let margin = unit * 0.75;
 
     let rectStyle = {
       fill: "#ffcc66",
     };
+
+    let boardElements = this.mergeBoardElements(this.props.stones, this.props.decoration)
+
+    // _.chain([this.props.stones, this.props.decoration])
+    //   .map(pairs)
+    //   .map(())
+
+    // {this.renderStones(this.props.stones, this.props.boardSize, unit, margin)}
+    // {this.renderDecoration(this.props.decoration, this.props.boardSize, unit, margin)}
 
     return (
       <svg height={svgSize} width={svgSize}>
@@ -178,20 +255,38 @@ class Board extends React.Component {
         <g onMouseMove={this.handleMouseMove}>
           <rect width={size} height={size} style={rectStyle} />
           {this.renderGrid(this.props.boardSize, unit, margin)}
-          {this.renderStones(this.props.stones, this.props.boardSize, unit, margin)}
-          {this.renderStonePreview()}
+          {this.renderBoardElements(this.props.boardSize, unit, margin, boardElements)}
         </g>
       </svg>
     )
   }
 }
 
+function getLastMove(node) {
+  if (!node) return undefined
+  if (node.B || node.W) return node;
+  if (node._parent) return getLastMove(node._parent);
+}
+
+function getCoords(node) {
+  if (!node) return undefined
+  if (node.B) return node.B;
+  if (node.W) return node.W;
+}
+
 function mapStateToProps(state) {
-  // return state.sgf.board
+  let lastMove = getCoords(getLastMove(state.sgf.currentNode));
+  let decoration = lastMove ? {[lastMove]: "circle"} : {}
+
+  let {boardSize, stones} = state.sgf.board
+  // let stones = state.sgf.board.stones
+  // console.log(lastMove);
+
   return {
-    boardSize: state.sgf.board.boardSize,
-    stones: state.sgf.board.stones,
-    currentTurn: state.sgf.board.currentTurn
+    boardSize,
+    stones,
+    decoration
+    // currentTurn: state.sgf.board.currentTurn
   };
 }
 
