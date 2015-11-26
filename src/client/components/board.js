@@ -33,7 +33,32 @@ class Stone extends React.Component {
 class Board extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {height: 480, width: 480};
+    this.state = {size: 480};
+  }
+
+  svg() {
+    ReactDOM.findDOMNode(this);
+  }
+
+  margin() {
+    return this.state.size / (this.props.boardSize + 1);
+  }
+
+  unit() {
+    return (this.state.size - this.margin() * 2) / (this.props.boardSize - 1)
+  }
+
+  parseCoordinate(coords) {
+    let offset = 'a'.charCodeAt();
+    let x = coords.charCodeAt(0) - offset,
+        y = coords.charCodeAt(1) - offset;
+
+    return [x, y];
+  }
+
+  toCoordinates(x, y) {
+    let offset = 'a'.charCodeAt();
+    return String.fromCharCode(offset + x) + String.fromCharCode(offset + y);
   }
 
   handleResize() {
@@ -45,7 +70,18 @@ class Board extends React.Component {
   }
 
   handleMouseMove(e) {
-    // console.log(e);
+    let svg = ReactDOM.findDOMNode(this);
+    let margin = this.margin();
+    let unit = this.unit();
+
+    let {clientX, clientY} = e;
+    let {offsetLeft, offsetTop} = svg;
+
+    let x = parseInt((clientX - offsetLeft - margin + unit / 2) / unit);
+    let y = parseInt((clientY - offsetTop - margin + unit / 2) / unit);
+
+    console.log(this.toCoordinates(x, y));
+    this.setState({preview: this.toCoordinates(x, y)});
   }
 
   getDefs() {
@@ -153,74 +189,34 @@ class Board extends React.Component {
     return <path d={grid.join(" ")} style={style} />
   }
 
-  renderStones(stones, boardSize, unit, margin) {
-    function parseColor(m) {
-      if (m.B) return 'B';
-      if (m.W) return 'W'
-    }
-    function parseCoordinate(coords) {
-      let offset = 'a'.charCodeAt(0);
-      let x = coords.charCodeAt(0) - offset,
-          y = coords.charCodeAt(1) - offset;
-
-      return [x, y];
-    }
-
-    return _.chain(stones).keys().map(coords => {
-      let color = stones[coords];
-      let [x, y] = parseCoordinate(coords);
-
-      let radius = 0.9 * (unit / 2);
-
-      let style = {
-        fill: color === "B" ? "#333333" : "white",
-        filter: color === "B" ? "url(#black-stone-shadows)" : "url(#white-stone-shadows)"
-        // fill: color === "B" ? "black" : "white",
-        // stroke: "black",
-        // strokeWidth: "0.25px",
-
-      };
-
-      return (
-        <circle key={`move-${coords}`}
-                r={radius}
-                cx={margin + unit * x}
-                cy={margin + unit * y}
-                style={style} />
-      );
-    }).value();
-  }
-
   renderBoardElements(boardSize, unit, margin, boardElements) {
-    function parseCoordinate(coords) {
-      let offset = 'a'.charCodeAt(0);
-      let x = coords.charCodeAt(0) - offset,
-          y = coords.charCodeAt(1) - offset;
-
-      return [x, y];
-    }
 
     return _.chain(boardElements).keys().map(coords => {
       let elements = boardElements[coords];
-      let [x, y] = parseCoordinate(coords);
+      let [x, y] = this.parseCoordinate(coords);
 
       let props = {
         key: coords,
         transform: `translate(${margin + unit * x}, ${margin + unit * y})`,
       };
 
-      let children = _.map(boardElements[coords], (el, i) => {
+      let children = _.map(boardElements[coords], (el, i, list) => {
         if (el == "B") {
           return <Stone key={i} color="B" unit={unit} />
-        } else if (el = "W") {
+        } else if (el == "W") {
           return <Stone key={i} color="W" unit={unit} />
         }
-        // else if (el = "circle") {
-        //   // return <circle key={i}
-        //   <circle key={`move-${coords}`}
-        //           r={radius}
-        //
-        // }
+        else if (el == "circle") {
+          let radius = 0.28 * unit;
+          let color = _.contains(list.slice(0, i), "B") ? "white" : "black";
+
+          let style = {
+            fill: "None",
+            stroke: color,
+            strokeWidth: unit / 12
+          };
+          return <circle key={`move-${coords}`} r={radius} style={style} />
+        }
       });
 
       return React.createElement("g", props, children)
@@ -229,11 +225,9 @@ class Board extends React.Component {
   }
 
   render() {
-    let svgSize = Math.min(this.state.height, this.state.width);
-    let size = svgSize;
-
-    let unit = size / (this.props.boardSize + 0.5);
-    let margin = unit * 0.75;
+    let size = this.state.size;
+    let unit = this.unit();
+    let margin = this.margin();
 
     let rectStyle = {
       fill: "#ffcc66",
@@ -241,18 +235,11 @@ class Board extends React.Component {
 
     let boardElements = this.mergeBoardElements(this.props.stones, this.props.decoration)
 
-    // _.chain([this.props.stones, this.props.decoration])
-    //   .map(pairs)
-    //   .map(())
-
-    // {this.renderStones(this.props.stones, this.props.boardSize, unit, margin)}
-    // {this.renderDecoration(this.props.decoration, this.props.boardSize, unit, margin)}
-
     return (
-      <svg height={svgSize} width={svgSize}>
+      <svg height={size} width={size} onMouseMove={this.handleMouseMove.bind(this)}>
         <defs dangerouslySetInnerHTML={this.getDefs()} />
 
-        <g onMouseMove={this.handleMouseMove}>
+        <g>
           <rect width={size} height={size} style={rectStyle} />
           {this.renderGrid(this.props.boardSize, unit, margin)}
           {this.renderBoardElements(this.props.boardSize, unit, margin, boardElements)}
