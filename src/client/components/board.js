@@ -20,7 +20,9 @@ class Stone extends React.Component {
 
     let style = {
       fill: this.props.color === "B" ? "#333333" : "white",
-      filter: this.props.color === "B" ? "url(#black-stone-shadows)" : "url(#white-stone-shadows)"
+      filter: this.props.color === "B" ? "url(#black-stone-shadows)" : "url(#white-stone-shadows)",
+      opacity: this.props.preview ? 0.5 : 1,
+
       // fill: color === "B" ? "black" : "white",
       // stroke: "black",
       // strokeWidth: "0.25px",
@@ -61,6 +63,12 @@ class Board extends React.Component {
     return String.fromCharCode(offset + x) + String.fromCharCode(offset + y);
   }
 
+  preview() {
+    if (this.props.preview && !this.props.stones[this.state.mousePosition]) {
+      return {[this.state.mousePosition]: "preview"}
+    }
+  }
+
   handleResize() {
     let svg = ReactDOM.findDOMNode(this);
     let height = svg.offsetHeight,
@@ -74,14 +82,13 @@ class Board extends React.Component {
     let margin = this.margin();
     let unit = this.unit();
 
-    let {clientX, clientY} = e;
+    let {pageX, pageY} = e;
     let {offsetLeft, offsetTop} = svg;
 
-    let x = parseInt((clientX - offsetLeft - margin + unit / 2) / unit);
-    let y = parseInt((clientY - offsetTop - margin + unit / 2) / unit);
+    let x = parseInt((pageX - offsetLeft - margin + unit / 2) / unit);
+    let y = parseInt((pageY - offsetTop - margin + unit / 2) / unit);
 
-    console.log(this.toCoordinates(x, y));
-    this.setState({preview: this.toCoordinates(x, y)});
+    this.setState({mousePosition: this.toCoordinates(x, y)});
   }
 
   getDefs() {
@@ -190,8 +197,7 @@ class Board extends React.Component {
   }
 
   renderBoardElements(boardSize, unit, margin, boardElements) {
-
-    return _.chain(boardElements).keys().map(coords => {
+    return Object.keys(boardElements).map(coords => {
       let elements = boardElements[coords];
       let [x, y] = this.parseCoordinate(coords);
 
@@ -216,12 +222,13 @@ class Board extends React.Component {
             strokeWidth: unit / 12
           };
           return <circle key={`move-${coords}`} r={radius} style={style} />
+        } else if (el == "preview") {
+          return <Stone key={i} color={this.props.preview} unit={unit} preview={true} />
         }
       });
 
       return React.createElement("g", props, children)
-    }).value();
-
+    });
   }
 
   render() {
@@ -233,7 +240,8 @@ class Board extends React.Component {
       fill: "#ffcc66",
     };
 
-    let boardElements = this.mergeBoardElements(this.props.stones, this.props.decoration)
+    let preview = this.preview();
+    let boardElements = this.mergeBoardElements(this.props.stones, this.props.decoration, preview);
 
     return (
       <svg height={size} width={size} onMouseMove={this.handleMouseMove.bind(this)}>
@@ -266,14 +274,13 @@ function mapStateToProps(state) {
   let decoration = lastMove ? {[lastMove]: "circle"} : {}
 
   let {boardSize, stones} = state.sgf.board
-  // let stones = state.sgf.board.stones
-  // console.log(lastMove);
+  let preview = state.sgf.board.currentTurn;
 
   return {
     boardSize,
     stones,
-    decoration
-    // currentTurn: state.sgf.board.currentTurn
+    decoration,
+    preview
   };
 }
 
