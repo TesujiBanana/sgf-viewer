@@ -19,13 +19,13 @@ class Stone extends React.Component {
     let radius = 0.9 * (this.props.unit / 2);
 
     let style = {
-      fill: this.props.color === "B" ? "#333333" : "white",
-      filter: this.props.color === "B" ? "url(#black-stone-shadows)" : "url(#white-stone-shadows)",
+      // fill: this.props.color === "B" ? "#333333" : "white",
+      // filter: this.props.color === "B" ? "url(#black-stone-shadows)" : "url(#white-stone-shadows)",
       opacity: this.props.preview ? 0.5 : 1,
 
-      // fill: color === "B" ? "black" : "white",
-      // stroke: "black",
-      // strokeWidth: "0.25px",
+      fill: this.props.color === "B" ? "black" : "white",
+      stroke: "black",
+      strokeWidth: "0.5px",
     };
 
     return <circle r={radius} style={style} />
@@ -77,18 +77,29 @@ class Board extends React.Component {
     this.setState({height, width});
   }
 
-  handleMouseMove(e) {
+  getCoordinatesFromMouseEvent({pageX, pageY}) {
     let svg = ReactDOM.findDOMNode(this);
     let margin = this.margin();
     let unit = this.unit();
 
-    let {pageX, pageY} = e;
     let {offsetLeft, offsetTop} = svg;
 
     let x = parseInt((pageX - offsetLeft - margin + unit / 2) / unit);
     let y = parseInt((pageY - offsetTop - margin + unit / 2) / unit);
 
-    this.setState({mousePosition: this.toCoordinates(x, y)});
+    return this.toCoordinates(x, y);
+  }
+
+  handleMouseMove(e) {
+    let coords = this.getCoordinatesFromMouseEvent(e);
+    this.setState({mousePosition: coords});
+  }
+
+  handleClick(e) {
+    if (this.props.onClick) {
+      let coords = this.getCoordinatesFromMouseEvent(e);
+      this.props.onClick(coords);
+    }
   }
 
   getDefs() {
@@ -237,14 +248,18 @@ class Board extends React.Component {
     let margin = this.margin();
 
     let rectStyle = {
-      fill: "#ffcc66",
+      // fill: "#ffcc66",
+      fill: "#FF69B4"
     };
 
     let preview = this.preview();
     let boardElements = this.mergeBoardElements(this.props.stones, this.props.decoration, preview);
 
+    let handleMouseMove = this.handleMouseMove.bind(this);
+    let handleClick = this.handleClick.bind(this);
+
     return (
-      <svg height={size} width={size} onMouseMove={this.handleMouseMove.bind(this)}>
+      <svg height={size} width={size} onMouseMove={handleMouseMove} onClick={handleClick}>
         <defs dangerouslySetInnerHTML={this.getDefs()} />
 
         <g>
