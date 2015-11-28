@@ -1,5 +1,5 @@
 import _ from "underscore";
-import {playMove} from "go-game-rules";
+import {playMove, InvalidMoveException} from "go-game-rules";
 
 import { combineReducers } from 'redux';
 import { routerStateReducer } from 'redux-router';
@@ -78,7 +78,6 @@ function SGFReducer(state=initialState, action) {
       }
     }
     case "NAVIGATE_END": {
-      // let currentNode =
       var currentNode = state.currentNode;
       while (currentNode._next) {
         currentNode = currentNode._next;
@@ -87,10 +86,39 @@ function SGFReducer(state=initialState, action) {
       return merge(state, { currentNode, board });
     }
     case "NAVIGATE_TO_MOVE": {
-
       let currentNode = action.move;
       let board = replayMoves(currentNode);
       return merge(state, { currentNode, board });
+    }
+    case "PLAY_MOVE": {
+      let color = state.board.currentTurn;
+      let currentNode = {
+        [color]: action.coordinates,
+        _parent: state.currentNode,
+      };
+
+      if (state.currentNode) {
+        if (state.currentNode._next) {
+          let next = [currentNode].concat(state.currentNode._next);
+          state.currentNode._next = next;
+        }
+        else {
+          state.currentNode._next = currentNode;
+        }
+      }
+
+      try {
+        let board = playMove(state.board, currentNode);
+        return merge(state, { currentNode, board });
+      } catch(err) {
+        if (err.name === "InvalidMoveException") {
+          console.error(err);
+          return state;
+        }
+        else {
+          throw err;
+        }
+      }
     }
     default:
       return state;

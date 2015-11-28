@@ -4,10 +4,15 @@ import Board from "./board";
 import Nav from "./nav";
 import Tree from "./tree";
 
-export default class Main extends React.Component {
+import { bindActionCreators } from "redux";
+import { connect } from "react-redux";
+import { playMove } from "../action_creators/gameplay";
+
+
+class Main extends React.Component {
 
   handleBoardClick(coords) {
-    console.log(coords);
+    this.props.actions.playMove(coords);
   }
 
   render() {
@@ -26,3 +31,11 @@ export default class Main extends React.Component {
       </div>)
   }
 }
+
+function mapDispatchToProps(dispatch) {
+  // let actionCreators = { navigateStart, navigateBack, navigateForward, navigateEnd };
+  let actionCreators = { playMove };
+  return { actions: bindActionCreators(actionCreators, dispatch) };
+}
+
+export default connect(null, mapDispatchToProps)(Main);
