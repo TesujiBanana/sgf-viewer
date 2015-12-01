@@ -207,6 +207,29 @@ class Board extends React.Component {
     return <path d={grid.join(" ")} style={style} />
   }
 
+  renderDots(boardSize, unit, margin) {
+    let size = unit * 0.08;
+    if (boardSize === 19) {
+      return [
+        [3, 3],
+        [3, 9],
+        [3, 15],
+        [9, 3],
+        [9, 9],
+        [9, 15],
+        [15, 3],
+        [15, 9],
+        [15, 15]
+      ].map(([x, y]) => {
+        let coords = this.toCoordinates(x, y);
+        return <circle ref={coords}
+                       r={size}
+                       cx={margin + unit * x}
+                       cy={margin + unit * y} />
+      })
+    }
+  }
+
   renderBoardElements(boardSize, unit, margin, boardElements) {
     return Object.keys(boardElements).map(coords => {
       let elements = boardElements[coords];
@@ -265,6 +288,7 @@ class Board extends React.Component {
         <g>
           <rect width={size} height={size} style={rectStyle} />
           {this.renderGrid(this.props.boardSize, unit, margin)}
+          {this.renderDots(this.props.boardSize, unit, margin)}
           {this.renderBoardElements(this.props.boardSize, unit, margin, boardElements)}
         </g>
       </svg>
