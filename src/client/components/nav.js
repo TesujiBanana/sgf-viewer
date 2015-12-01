@@ -12,12 +12,16 @@ class Nav extends React.Component {
       textAlign: "center"
     };
 
+    let buttonStyle = {
+      margin: 8
+    };
+
     return (
       <div style={style}>
-        <i className="fa fa-fast-backward" onClick={this.props.actions.navigateStart}/>
-        <i className="fa fa-step-backward" onClick={this.props.actions.navigateBack}/>
-        <i className="fa fa-step-forward" onClick={this.props.actions.navigateForward}/>
-        <i className="fa fa-fast-forward" onClick={this.props.actions.navigateEnd}/>
+        <i className="fa fa-fast-backward" style={buttonStyle} onClick={this.props.actions.navigateStart}/>
+        <i className="fa fa-step-backward" style={buttonStyle} onClick={this.props.actions.navigateBack}/>
+        <i className="fa fa-step-forward" style={buttonStyle} onClick={this.props.actions.navigateForward}/>
+        <i className="fa fa-fast-forward" style={buttonStyle} onClick={this.props.actions.navigateEnd}/>
       </div>
     );
   }

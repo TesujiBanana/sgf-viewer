@@ -8,13 +8,6 @@ function merge(source, obj) {
   return _.extend({}, source, obj);
 }
 
-// TODO: account for game info attributes ...
-let emptyBoard = {
-  boardSize: 19,
-  currentTurn: "B",
-  stones: {}
-}
-
 function replayMoves(node) {
   let previous = node._parent ? replayMoves(node._parent) : emptyBoard;
   if (node.W || node.B) {
@@ -25,10 +18,19 @@ function replayMoves(node) {
   }
 }
 
+// TODO: account for game info attributes ...
+let emptyBoard = {
+  boardSize: 19,
+  currentTurn: "B",
+  stones: {}
+}
+
+let blankNode = {}
+
 let initialState = {
-  nodes: [],
+  nodes: [blankNode],
   gameInfo: {},
-  currentNode: null,
+  currentNode: blankNode,
   board: emptyBoard
 };
 
@@ -52,18 +54,22 @@ function SGFReducer(state=initialState, action) {
         source: currentNode.SO,
         copyright: currentNode.CP
       };
-      return merge(state, { nodes, gameInfo, currentNode });
+
+      let board = emptyBoard;
+      return { nodes, gameInfo, currentNode, board };
     }
     case "NAVIGATE_START": {
       let currentNode = state.nodes[0];
       let board = emptyBoard;
-      return merge(state, { currentNode, board });
+      let { nodes, gameInfo } = state;
+      return { nodes, gameInfo, currentNode, board };
     }
     case "NAVIGATE_BACK": {
       if (state.currentNode && state.currentNode._parent) {
         let currentNode = state.currentNode._parent;
         let board = state.board.previous;
-        return merge(state, { currentNode, board });
+        let { nodes, gameInfo } = state;
+        return { nodes, gameInfo, currentNode, board };
       } else {
         return state;
       }
@@ -72,7 +78,8 @@ function SGFReducer(state=initialState, action) {
       if (state.currentNode && state.currentNode._next) {
         let currentNode = state.currentNode._next;
         let board = playMove(state.board, currentNode);
-        return merge(state, { currentNode, board });
+        let { nodes, gameInfo } = state;
+        return { nodes, gameInfo, currentNode, board };
       } else {
         return state;
       }
@@ -83,12 +90,14 @@ function SGFReducer(state=initialState, action) {
         currentNode = currentNode._next;
       }
       let board = replayMoves(currentNode);
-      return merge(state, { currentNode, board });
+      let { nodes, gameInfo } = state;
+      return { nodes, gameInfo, currentNode, board };
     }
     case "NAVIGATE_TO_MOVE": {
       let currentNode = action.move;
       let board = replayMoves(currentNode);
-      return merge(state, { currentNode, board });
+      let { nodes, gameInfo } = state;
+      return { nodes, gameInfo, currentNode, board };
     }
     case "PLAY_MOVE": {
       let color = state.board.currentTurn;
@@ -109,7 +118,10 @@ function SGFReducer(state=initialState, action) {
 
       try {
         let board = playMove(state.board, currentNode);
-        return merge(state, { currentNode, board });
+        // return merge(state, { currentNode, board });
+        let nodes = state.nodes.concat(currentNode);
+        let { gameInfo } = state;
+        return { nodes, gameInfo, currentNode, board };
       } catch(err) {
         if (err.name === "InvalidMoveException") {
           console.error(err);
